@@ -38,7 +38,6 @@ def find_places_nearby(midpoint, radius=50000):
 
 
 def get_average_latitude(coordinates_list):
-    # Loop through each coordinate pair in the list and calculate the average latitude
     total_latitude = 0
     for coordinate in coordinates_list:
         total_latitude += coordinate[0]  # The latitude is the first value in each coordinate pair
@@ -119,16 +118,10 @@ def convert_address_to_cartesian(address):
 def visualize_coordinates(coordinates):
     map_center = coordinates[0], coordinates[1]
     my_map = folium.Map(location=map_center, zoom_start=12)
-    # Add markers for each coordinate
     coordinates = [coordinates]
     for lat, lon in coordinates:
         folium.Marker([lat, lon]).add_to(my_map)
-
-    # Save the map as an HTML file
     my_map.save("map.html")
-
-    # If you're using Jupyter Notebook, you can display the map directly
-    # my_map
 
 
 if __name__ == '__main__':
