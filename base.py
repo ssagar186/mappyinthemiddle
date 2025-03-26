@@ -41,10 +41,9 @@ class LocationFinder:
             return []
 
     def get_average_latitude(self):
-        # Loop through each coordinate pair in the list and calculate the average latitude
         total_latitude = 0
         for coordinate in self.coordinates_list:
-            total_latitude += coordinate[0]  # The latitude is the first value in each coordinate pair
+            total_latitude += coordinate[0]
         self.average_latitude = total_latitude / len(self.coordinates_list)
         return self.average_latitude
 
@@ -91,9 +90,16 @@ class LocationFinder:
         representative_center = self.calculate_representative_point(polygon_points)
         print(f"representative_center:{representative_center}")
         print(f"The centroid of the polygon is: {centroid}")
-        self.midpoint = centroid
-        nearby_places = self.find_places_nearby()
-        closest_place = (nearby_places[0][1], nearby_places[0][2])
+
+        try:
+            self.midpoint = centroid
+            nearby_places = self.find_places_nearby()
+            closest_place = (nearby_places[0][1], nearby_places[0][2])
+        except IndexError:
+            self.midpoint = representative_center
+            nearby_places = self.find_places_nearby()
+            closest_place = (nearby_places[0][1], nearby_places[0][2])
+
         self.visualize_coordinates(closest_place)
         if nearby_places:
             return {
@@ -102,7 +108,6 @@ class LocationFinder:
             }
         else:
             return "No places found near midpoint"
-
 
     def visualize_coordinates(self, coordinates):
         map_center = coordinates[0], coordinates[1]
@@ -128,7 +133,17 @@ if __name__ == '__main__':
             break
         try:
             address = lookup_address(address)
-            addresses.append(address)
+            option = input("Is this the correct address?")
+            if option.lower() == 'yes' or option.lower() == 'y' or option.lower() == '1':
+                addresses.append(address)
+            elif option.lower() == 'no' or option.lower() == 'n' or option.lower() == '2':
+                address = input("Please reenter the address:")
+                address = lookup_address(address)
+                option = input("Is this the correct address?")
+                if option.lower() == 'yes' or option.lower() == 'y' or option.lower() == '1':
+                    addresses.append(address)
+                elif option.lower() == 'no' or option.lower() == 'n' or option.lower() == '2':
+                    continue
         except AttributeError:
             print(f'Address not found')
     location_finder = LocationFinder(addresses)
