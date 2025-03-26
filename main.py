@@ -1,11 +1,18 @@
 import geopy
-from shapely.geometry import Polygon
+from shapely.geometry import Polygon, LineString, Point
 import folium
+
 
 def calculate_centroid(polygon_points):
     polygon = Polygon(polygon_points)
     centroid = polygon.centroid
     return centroid.x, centroid.y
+
+
+def calculate_representative_point(polygon_points):
+    polygon = Polygon(polygon_points)
+    representative_point = polygon.representative_point()
+    return representative_point.x, representative_point.y
 
 
 def get_coordinates(address):
@@ -17,10 +24,11 @@ def get_coordinates(address):
         return None
 
 
-def find_places_nearby(midpoint, radius=5000):
+def find_places_nearby(midpoint, radius=50000):
     geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
     query = f"restaurants near {midpoint[0]}, {midpoint[1]}"
-    places = geolocate.geocode(query, exactly_one=False, limit=5)
+    query = f"parks near {midpoint[0]}, {midpoint[1]}"
+    places = geolocate.geocode(query, exactly_one=False, limit=10)
     print(f"places: {places}")
     if places:
         for place in places:
@@ -53,13 +61,14 @@ def find_meeting_places_average(*addresses):
         if not coordinates:
             return f"Could not find coordinates for {address}"
         coordinates_list.append(coordinates)
-        # print(f"Coordinates for {address}: {coordinates}")
+        print(f"Coordinates for {address}: {coordinates}")
     average_latitude = get_average_latitude(coordinates_list)
     average_longitude = get_average_longitude(coordinates_list)
     print(f"average latitude: {average_latitude}, average longitude: {average_longitude}")
     midpoint = (average_latitude, average_longitude)
     nearby_places = find_places_nearby(midpoint)
-    closest_place = (nearby_places[0][1],nearby_places[0][2])
+    print(f"nearby_places:{nearby_places}")
+    closest_place = (nearby_places[0][1], nearby_places[0][2])
     visualize_coordinates(closest_place)
     if nearby_places:
         return {
@@ -80,9 +89,10 @@ def find_meeting_places_central(*addresses):
         print(f"Coordinates for {address}: {coordinates}")
     polygon_points = coordinates_list
     centroid = calculate_centroid(polygon_points)
+    representative_center = calculate_representative_point(polygon_points)
+    print(f"representative_center:{representative_center}")
     print(f"The centroid of the polygon is: {centroid}")
     midpoint = centroid
-
     nearby_places = find_places_nearby(midpoint)
     closest_place = (nearby_places[0][1], nearby_places[0][2])
     visualize_coordinates(closest_place)
@@ -105,8 +115,8 @@ def lookup_address(address):
 def convert_address_to_cartesian(address):
     pass
 
-def visualize_coordinates(coordinates):
 
+def visualize_coordinates(coordinates):
     map_center = coordinates[0], coordinates[1]
     my_map = folium.Map(location=map_center, zoom_start=12)
     # Add markers for each coordinate
@@ -132,7 +142,8 @@ if __name__ == '__main__':
             addresses.append(address)
         except AttributeError:
             print(f'Address not found')
-    if len(addresses) < 4:
+    if len(addresses) < 3:
         result = find_meeting_places_average(*addresses)
     else:
+        #result = find_meeting_places_average(*addresses)
         result = find_meeting_places_central(*addresses)
