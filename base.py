@@ -12,6 +12,7 @@ class LocationFinder:
         self.coordinates = None
         self.midpoint = None
         self.coordinates_list = []
+        self.poi = 'Restaurants'
 
     def calculate_centroid(self, polygon_points):
         polygon = Polygon(polygon_points)
@@ -30,8 +31,8 @@ class LocationFinder:
 
     def find_places_nearby(self):
         geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
-        query = f"restaurants near {self.midpoint[0]}, {self.midpoint[1]}"
-        query = f"parks near {self.midpoint[0]}, {self.midpoint[1]}"
+        query = f"{self.poi} near {self.midpoint[0]}, {self.midpoint[1]}"
+        # query = f"parks near {self.midpoint[0]}, {self.midpoint[1]}"
         places = geolocate.geocode(query, exactly_one=False, limit=10)
         print(f"places: {places}")
         if places:
@@ -90,15 +91,12 @@ class LocationFinder:
         representative_center = self.calculate_representative_point(polygon_points)
         print(f"representative_center:{representative_center}")
         print(f"The centroid of the polygon is: {centroid}")
-
         try:
             self.midpoint = centroid
-            nearby_places = self.find_places_nearby()
-            closest_place = (nearby_places[0][1], nearby_places[0][2])
         except IndexError:
             self.midpoint = representative_center
-            nearby_places = self.find_places_nearby()
-            closest_place = (nearby_places[0][1], nearby_places[0][2])
+        nearby_places = self.find_places_nearby()
+        closest_place = (nearby_places[0][1], nearby_places[0][2])
 
         self.visualize_coordinates(closest_place)
         if nearby_places:
@@ -125,6 +123,17 @@ def lookup_address(address):
     return location.address
 
 
+def validate_input():
+    while True:
+        option = input("Is this the correct address?").lower()
+        if option in ['yes', 'y', '1']:
+            return True
+        elif option in ['no', 'n', '2']:
+            return False
+        else:
+            print("Invalid input.")
+
+
 if __name__ == '__main__':
     addresses = []
     while True:
@@ -133,17 +142,15 @@ if __name__ == '__main__':
             break
         try:
             address = lookup_address(address)
-            option = input("Is this the correct address?")
-            if option.lower() == 'yes' or option.lower() == 'y' or option.lower() == '1':
+            if validate_input():
                 addresses.append(address)
-            elif option.lower() == 'no' or option.lower() == 'n' or option.lower() == '2':
+            else:
                 address = input("Please reenter the address:")
+                if address.lower() == 'done':
+                    break
                 address = lookup_address(address)
-                option = input("Is this the correct address?")
-                if option.lower() == 'yes' or option.lower() == 'y' or option.lower() == '1':
+                if validate_input():
                     addresses.append(address)
-                elif option.lower() == 'no' or option.lower() == 'n' or option.lower() == '2':
-                    continue
         except AttributeError:
             print(f'Address not found')
     location_finder = LocationFinder(addresses)
