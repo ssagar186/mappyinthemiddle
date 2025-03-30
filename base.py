@@ -4,7 +4,7 @@ import folium
 
 
 class LocationFinder:
-    def __init__(self, addresses):
+    def __init__(self, *addresses):
         self.average_longitude = None
         self.average_latitude = None
         self.location = None
@@ -13,21 +13,22 @@ class LocationFinder:
         self.midpoint = None
         self.coordinates_list = []
         self.poi = 'Restaurants'
-
-    def calculate_centroid(self, polygon_points):
-        polygon = Polygon(polygon_points)
-        centroid = polygon.centroid
-        return centroid.x, centroid.y
-
-    def calculate_representative_point(self, polygon_points):
-        polygon = Polygon(polygon_points)
-        representative_point = polygon.representative_point()
-        return representative_point.x, representative_point.y
+        self.update_coordinates_list()
 
     def get_coordinates(self, address):
         geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
         self.location = geolocate.geocode(address)
         return self.location.latitude, self.location.longitude
+
+    def update_coordinates_list(self):
+        self.coordinates_list = []
+        for address in self.addresses:
+            self.coordinates = self.get_coordinates(address)
+            if not self.coordinates:
+                return f"Could not find coordinates for {address}"
+            self.coordinates_list.append(self.coordinates)
+            print(f"Coordinates for {address}: {self.coordinates}")
+            return self.coordinates_list
 
     def find_places_nearby(self):
         geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
@@ -55,14 +56,17 @@ class LocationFinder:
         self.average_longitude = total_longitude / len(self.coordinates_list)
         return self.average_longitude
 
-    def find_meeting_places_average(self, *addresses):
-        self.coordinates_list = []
-        for address in addresses:
-            self.coordinates = self.get_coordinates(address)
-            if not self.coordinates:
-                return f"Could not find coordinates for {address}"
-            self.coordinates_list.append(self.coordinates)
-            print(f"Coordinates for {address}: {self.coordinates}")
+    def calculate_centroid(self, polygon_points):
+        polygon = Polygon(polygon_points)
+        centroid = polygon.centroid
+        return centroid.x, centroid.y
+
+    def calculate_representative_point(self, polygon_points):
+        polygon = Polygon(polygon_points)
+        representative_point = polygon.representative_point()
+        return representative_point.x, representative_point.y
+
+    def find_meeting_places_average(self):
         average_latitude = self.get_average_latitude()
         average_longitude = self.get_average_longitude()
         print(f"average latitude: {average_latitude}, average longitude: {average_longitude}")
@@ -79,13 +83,7 @@ class LocationFinder:
         else:
             return "No places found near midpoint"
 
-    def find_meeting_places_central(self=None, *addresses):
-        for address in addresses:
-            coordinates = self.get_coordinates(address)
-            if not coordinates:
-                return f"Could not find coordinates for {address}"
-            self.coordinates_list.append(coordinates)
-            print(f"Coordinates for {address}: {coordinates}")
+    def find_meeting_places_central(self=None):
         polygon_points = self.coordinates_list
         centroid = self.calculate_centroid(polygon_points)
         representative_center = self.calculate_representative_point(polygon_points)
@@ -153,9 +151,9 @@ if __name__ == '__main__':
                     addresses.append(address)
         except AttributeError:
             print(f'Address not found')
-    location_finder = LocationFinder(addresses)
+    location_finder = LocationFinder(*addresses)
     if len(addresses) < 3:
-        result = location_finder.find_meeting_places_average(*addresses)
+        result = location_finder.find_meeting_places_average()
     else:
         # result = find_meeting_places_average(*addresses)
-        result = location_finder.find_meeting_places_central(*addresses)
+        result = location_finder.find_meeting_places_central()
