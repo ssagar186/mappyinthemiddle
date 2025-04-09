@@ -3,38 +3,18 @@ from shapely.geometry import Polygon, LineString, Point
 import folium
 
 
-class LocationFinder:
+class CoordinateFinder:
     def __init__(self, *addresses):
-        self.centroid = None
-        self.representative_point = None
-        self.polygon_points = None
-        self.average_longitude = None
-        self.average_latitude = None
         self.location = None
         self.addresses = addresses
         self.coordinates = None
-        self.midpoint = None
         self.coordinates_list = []
-        self.poi = 'Restaurants'
+
 
     def get_coordinates(self, address):
         geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
         self.location = geolocate.geocode(address)
         return self.location.latitude, self.location.longitude
-
-    def get_average_latitude(self):
-        total_latitude = 0
-        for coordinate in self.coordinates_list:
-            total_latitude += coordinate[0]
-        self.average_latitude = total_latitude / len(self.coordinates_list)
-        return self.average_latitude
-
-    def get_average_longitude(self):
-        total_longitude = 0
-        for coordinate in self.coordinates_list:
-            total_longitude += coordinate[1]
-        self.average_longitude = total_longitude / len(self.coordinates_list)
-        return self.average_longitude
 
     def update_coordinates_list(self):
         self.coordinates_list = []
@@ -44,18 +24,47 @@ class LocationFinder:
             if not self.coordinates:
                 return f"Could not find coordinates for {address}"
             self.coordinates_list.append(self.coordinates)
+        return self.coordinates_list
+
+class CalculateCenter:
+    def __init__(self, coordinates_list):
+        self.coordinates = None
+        self.coordinates_list = coordinates_list
+        self.average_latitude = None
+        self.average_longitude = None
+
+    def get_average_lat_long(self):
+        total_latitude = 0
+        for coordinate in self.coordinates_list:
+            total_latitude += coordinate[0]
+        self.average_latitude = total_latitude / len(self.coordinates_list)
+        total_longitude = 0
+        for coordinate in self.coordinates_list:
+            total_longitude += coordinate[1]
+        self.average_longitude = total_longitude / len(self.coordinates_list)
+        return self.average_latitude, self.average_longitude
 
     def calculate_centroid(self):
         polygon = Polygon(self.coordinates_list)
         centroid = polygon.centroid
         self.centroid = centroid
-        return centroid.x, centroid.y
+        return self.centroid.x, self.centroid.y
 
     def calculate_representative_point(self):
         polygon = Polygon(self.coordinates_list)
         representative_point = polygon.representative_point()
         self.representative_point = representative_point
-        return representative_point.x, representative_point.y
+        return self.representative_point.x, self.representative_point.y
+
+class LocationFinder:
+    def __init__(self, midpoint, POI):
+        self.location = None
+        self.coordinates = None
+        self.midpoint = midpoint
+        self.coordinates_list = []
+        self.poi = POI
+        self.centroid = None
+        self.representative_point = None
 
     def find_places_nearby(self):
         geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
@@ -69,34 +78,10 @@ class LocationFinder:
         else:
             return []
 
-    def find_meeting_places_average(self):
-        average_latitude = self.get_average_latitude()
-        average_longitude = self.get_average_longitude()
-        self.midpoint = (average_latitude, average_longitude)
+    def find_meeting_places(self):
         nearby_places = self.find_places_nearby()
         print(f"nearby_places:{nearby_places}")
         closest_place = (nearby_places[0][1], nearby_places[0][2])
-        self.visualize_coordinates(closest_place)
-        if nearby_places:
-            return {
-                "midpoint": self.midpoint,
-                "places": nearby_places
-            }
-        else:
-            return "No places found near midpoint"
-
-    def find_meeting_places_central(self):
-        centroid = self.calculate_centroid()
-        representative_center = self.calculate_representative_point()
-        print(f"representative_center:{representative_center}")
-        print(f"The centroid of the polygon is: {centroid}")
-        try:
-            self.midpoint = centroid
-        except IndexError:
-            self.midpoint = representative_center
-        nearby_places = self.find_places_nearby()
-        closest_place = (nearby_places[0][1], nearby_places[0][2])
-
         self.visualize_coordinates(closest_place)
         if nearby_places:
             return {
@@ -152,10 +137,20 @@ if __name__ == '__main__':
                     addresses.append(address)
         except AttributeError:
             print(f'Address not found')
-    location_finder = LocationFinder(*addresses)
-    location_finder.update_coordinates_list()
+    coordinate_finder = CoordinateFinder(*addresses)
+    coordinates_list = coordinate_finder.update_coordinates_list()
+    calculate_center = CalculateCenter(coordinates_list)
+    POI = "Restaurants"
+    midpoint = ""
     if len(addresses) < 3:
-        result = location_finder.find_meeting_places_average()
+        latitude, longitude = calculate_center.get_average_lat_long()
+        midpoint = latitude, longitude
     else:
-        # result = find_meeting_places_average(*addresses)
-        result = location_finder.find_meeting_places_central()
+        centroid = calculate_center.calculate_centroid()
+        representative_point = calculate_center.calculate_representative_point()
+        if centroid:
+            midpoint = centroid
+        elif representative_point:
+            midpoint = representative_point
+    location_finder = LocationFinder(midpoint, POI)
+    result = location_finder.find_meeting_places()
