@@ -45,18 +45,6 @@ class LocationFinder:
                 return f"Could not find coordinates for {address}"
             self.coordinates_list.append(self.coordinates)
 
-    def find_places_nearby(self):
-        geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
-        query = f"{self.poi} near {self.midpoint[0]}, {self.midpoint[1]}"
-        # query = f"parks near {self.midpoint[0]}, {self.midpoint[1]}"
-        places = geolocate.geocode(query, exactly_one=False, limit=10)
-        print(f"places: {places}")
-        if places:
-            for place in places:
-                return [(place.address, place.latitude, place.longitude)]
-        else:
-            return []
-
     def calculate_centroid(self):
         polygon = Polygon(self.coordinates_list)
         centroid = polygon.centroid
@@ -68,6 +56,18 @@ class LocationFinder:
         representative_point = polygon.representative_point()
         self.representative_point = representative_point
         return representative_point.x, representative_point.y
+
+    def find_places_nearby(self):
+        geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
+        query = f"{self.poi} near {self.midpoint[0]}, {self.midpoint[1]}"
+        # query = f"parks near {self.midpoint[0]}, {self.midpoint[1]}"
+        places = geolocate.geocode(query, exactly_one=False, limit=10)
+        print(f"places: {places}")
+        if places:
+            for place in places:
+                return [(place.address, place.latitude, place.longitude)]
+        else:
+            return []
 
     def find_meeting_places_average(self):
         average_latitude = self.get_average_latitude()
