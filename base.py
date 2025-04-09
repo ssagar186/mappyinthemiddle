@@ -22,6 +22,20 @@ class LocationFinder:
         self.location = geolocate.geocode(address)
         return self.location.latitude, self.location.longitude
 
+    def get_average_latitude(self):
+        total_latitude = 0
+        for coordinate in self.coordinates_list:
+            total_latitude += coordinate[0]
+        self.average_latitude = total_latitude / len(self.coordinates_list)
+        return self.average_latitude
+
+    def get_average_longitude(self):
+        total_longitude = 0
+        for coordinate in self.coordinates_list:
+            total_longitude += coordinate[1]
+        self.average_longitude = total_longitude / len(self.coordinates_list)
+        return self.average_longitude
+
     def update_coordinates_list(self):
         self.coordinates_list = []
         for address in self.addresses:
@@ -42,20 +56,6 @@ class LocationFinder:
                 return [(place.address, place.latitude, place.longitude)]
         else:
             return []
-
-    def get_average_latitude(self):
-        total_latitude = 0
-        for coordinate in self.coordinates_list:
-            total_latitude += coordinate[0]
-        self.average_latitude = total_latitude / len(self.coordinates_list)
-        return self.average_latitude
-
-    def get_average_longitude(self):
-        total_longitude = 0
-        for coordinate in self.coordinates_list:
-            total_longitude += coordinate[1]
-        self.average_longitude = total_longitude / len(self.coordinates_list)
-        return self.average_longitude
 
     def calculate_centroid(self):
         polygon = Polygon(self.coordinates_list)
