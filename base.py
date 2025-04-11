@@ -3,13 +3,54 @@ from shapely.geometry import Polygon, LineString, Point
 import folium
 
 
+class AddressCheck:
+    def __init__(self):
+        self.location = None
+        self.addresses = []
+        self.address = None
+
+    def lookup_address(self):
+        geolocator = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
+        self.location = geolocator.geocode(self.address)
+        print(f"Validated Address: {self.location.address}")
+        return self.location.address
+
+    def validate_input(self):
+        while True:
+            option = input("Is this the correct address?").lower()
+            if option in ['yes', 'y', '1']:
+                return True
+            elif option in ['no', 'n', '2']:
+                return False
+            else:
+                print("Invalid input.")
+
+    def address_input(self):
+        while True:
+            self.address = input("Please enter an address (or type 'done' to finish): ")
+            if self.address.lower() == 'done':
+                break
+            try:
+                self.address = self.lookup_address()
+                if self.validate_input():
+                    self.addresses.append(self.address)
+                else:
+                    self.address = input("Please reenter the address:")
+                    if self.address.lower() == 'done':
+                        break
+                    self.address = self.lookup_address()
+                    if self.validate_input():
+                        self.addresses.append(self.address)
+            except AttributeError:
+                print(f'Address not found')
+
+
 class CoordinateFinder:
     def __init__(self, *addresses):
         self.location = None
         self.addresses = addresses
         self.coordinates = None
         self.coordinates_list = []
-
 
     def get_coordinates(self, address):
         geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
@@ -26,8 +67,11 @@ class CoordinateFinder:
             self.coordinates_list.append(self.coordinates)
         return self.coordinates_list
 
+
 class CalculateCenter:
     def __init__(self, coordinates_list):
+        self.centroid = None
+        self.representative_point = None
         self.coordinates = None
         self.coordinates_list = coordinates_list
         self.average_latitude = None
@@ -35,9 +79,9 @@ class CalculateCenter:
         self.midpoint = None
 
     def get_midpoint(self):
-        if len(coordinates_list) < 3:
+        if len(self.coordinates_list) < 3:
             self.midpoint = self.get_average_lat_long()
-        elif len(coordinates_list) > 2:
+        elif len(self.coordinates_list) > 2:
             self.midpoint = self.calculate_centroid()
             if self.centroid:
                 pass
@@ -68,13 +112,14 @@ class CalculateCenter:
         self.representative_point = representative_point
         return self.representative_point.x, self.representative_point.y
 
+
 class LocationFinder:
-    def __init__(self, midpoint, POI):
+    def __init__(self, midpoint, point_of_interest):
         self.location = None
         self.coordinates = None
         self.midpoint = midpoint
         self.coordinates_list = []
-        self.poi = POI
+        self.poi = point_of_interest
         self.centroid = None
         self.representative_point = None
 
@@ -112,49 +157,14 @@ class LocationFinder:
         my_map.save("map.html")
 
 
-def lookup_address(address):
-    geolocator = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
-    location = geolocator.geocode(address)
-    print(f"Validated Address: {location.address}")
-    return location.address
-
-
-def validate_input():
-    while True:
-        option = input("Is this the correct address?").lower()
-        if option in ['yes', 'y', '1']:
-            return True
-        elif option in ['no', 'n', '2']:
-            return False
-        else:
-            print("Invalid input.")
-
-def address_input():
-    while True:
-        address = input("Please enter an address (or type 'done' to finish): ")
-        if address.lower() == 'done':
-            break
-        try:
-            address = lookup_address(address)
-            if validate_input():
-                addresses.append(address)
-            else:
-                address = input("Please reenter the address:")
-                if address.lower() == 'done':
-                    break
-                address = lookup_address(address)
-                if validate_input():
-                    addresses.append(address)
-        except AttributeError:
-                print(f'Address not found')
-
 if __name__ == '__main__':
-    addresses = []
-    address_input()
-    coordinate_finder = CoordinateFinder(*addresses)
-    coordinates_list = coordinate_finder.update_coordinates_list()
-    calculate_center = CalculateCenter(coordinates_list)
+    address_check = AddressCheck()
+    address_check.address_input()
+    addresses_list = address_check.addresses
+    coordinate_finder = CoordinateFinder(*address_check.addresses)
+    coordinate_finder.update_coordinates_list()
+    calculate_center = CalculateCenter(coordinate_finder.coordinates_list)
     POI = "Restaurants"
-    midpoint = calculate_center.get_midpoint()
-    location_finder = LocationFinder(midpoint, POI)
+    calculate_center.get_midpoint()
+    location_finder = LocationFinder(calculate_center.midpoint, POI)
     result = location_finder.find_meeting_places()
