@@ -32,6 +32,18 @@ class CalculateCenter:
         self.coordinates_list = coordinates_list
         self.average_latitude = None
         self.average_longitude = None
+        self.midpoint = None
+
+    def get_midpoint(self):
+        if len(coordinates_list) < 3:
+            self.midpoint = self.get_average_lat_long()
+        elif len(coordinates_list) > 2:
+            self.midpoint = self.calculate_centroid()
+            if self.centroid:
+                pass
+            else:
+                self.midpoint = self.calculate_representative_point()
+        return self.midpoint
 
     def get_average_lat_long(self):
         total_latitude = 0
@@ -141,16 +153,6 @@ if __name__ == '__main__':
     coordinates_list = coordinate_finder.update_coordinates_list()
     calculate_center = CalculateCenter(coordinates_list)
     POI = "Restaurants"
-    midpoint = ""
-    if len(addresses) < 3:
-        latitude, longitude = calculate_center.get_average_lat_long()
-        midpoint = latitude, longitude
-    else:
-        centroid = calculate_center.calculate_centroid()
-        representative_point = calculate_center.calculate_representative_point()
-        if centroid:
-            midpoint = centroid
-        elif representative_point:
-            midpoint = representative_point
+    midpoint = calculate_center.get_midpoint()
     location_finder = LocationFinder(midpoint, POI)
     result = location_finder.find_meeting_places()
