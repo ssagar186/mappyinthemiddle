@@ -129,9 +129,7 @@ def validate_input():
         else:
             print("Invalid input.")
 
-
-if __name__ == '__main__':
-    addresses = []
+def address_input():
     while True:
         address = input("Please enter an address (or type 'done' to finish): ")
         if address.lower() == 'done':
@@ -148,7 +146,11 @@ if __name__ == '__main__':
                 if validate_input():
                     addresses.append(address)
         except AttributeError:
-            print(f'Address not found')
+                print(f'Address not found')
+
+if __name__ == '__main__':
+    addresses = []
+    address_input()
     coordinate_finder = CoordinateFinder(*addresses)
     coordinates_list = coordinate_finder.update_coordinates_list()
     calculate_center = CalculateCenter(coordinates_list)
