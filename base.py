@@ -127,23 +127,24 @@ class LocationFinder:
         geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
         query = f"{self.poi} near {self.midpoint[0]}, {self.midpoint[1]}"
         # query = f"parks near {self.midpoint[0]}, {self.midpoint[1]}"
-        places = geolocate.geocode(query, exactly_one=False, limit=10)
-        print(f"places: {places}")
-        if places:
-            for place in places:
+        places_list = geolocate.geocode(query, exactly_one=False, limit=10)
+        print(f"List of Places: {places_list}")
+        if places_list:
+            for place in places_list:
                 return [(place.address, place.latitude, place.longitude)]
         else:
             return []
 
     def find_meeting_places(self):
-        nearby_places = self.find_places_nearby()
-        print(f"nearby_places:{nearby_places}")
-        closest_place = (nearby_places[0][1], nearby_places[0][2])
-        self.visualize_coordinates(closest_place)
-        if nearby_places:
+        closest_place = self.find_places_nearby()
+        print(f"closest_place:{closest_place}")
+        closest_place_coordinates = (closest_place[0][1], closest_place[0][2])
+        print(f"closest_place_coordinates:{closest_place_coordinates}")
+        self.visualize_coordinates(closest_place_coordinates)
+        if closest_place:
             return {
                 "midpoint": self.midpoint,
-                "places": nearby_places
+                "places": closest_place
             }
         else:
             return "No places found near midpoint"
