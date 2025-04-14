@@ -1,6 +1,7 @@
 import geopy
 from shapely.geometry import Polygon, LineString, Point
 import folium
+from folium.plugins import HeatMap
 import pandas as pd
 pd.set_option('display.max_colwidth', 125)
 
@@ -136,13 +137,24 @@ class LocationFinder:
         else:
             return []
 
+    def extract_coordinates_from_places_list(self):
+        places_list_coordinates = []
+        print(f'debug_places_list{self.places_list}')
+        places_list = self.places_list
+        ## This loop is not wokring correctly. It is only extracting the first instance
+        for place in places_list:
+            coordinates = place.latitude, place.longitude
+            print(f'coordinates_debug{coordinates}')
+            places_list_coordinates.append(coordinates)
+        self.places_list_coordinates = places_list_coordinates
+        return self.places_list_coordinates
+
     def find_meeting_places(self):
         closest_place = self.find_places_nearby()
         print(f"closest_place:{closest_place}")
         closest_place_coordinates = (closest_place[0][1], closest_place[0][2])
+        self.closest_place_coordinates = closest_place_coordinates
         #print(f"closest_place_coordinates:{closest_place_coordinates}")
-        self.visualize_coordinates(closest_place_coordinates)
-        self.visualize_table()
         if closest_place:
             return {
                 "midpoint": self.midpoint,
@@ -156,14 +168,15 @@ class LocationFinder:
         df.set_index('Place', inplace=True)
         print(df)
 
-    def visualize_coordinates(self, coordinates):
-        map_center = coordinates[0], coordinates[1]
+    def visualize_coordinates(self, closest_place_coordinates, coordinates_list, places_list_coordinates):
+        map_center = closest_place_coordinates[0], closest_place_coordinates[1]
         my_map = folium.Map(location=map_center, zoom_start=12)
-        coordinates = [coordinates]
+        coordinates = [closest_place_coordinates]
         for lat, lon in coordinates:
             folium.Marker([lat, lon], icon=folium.Icon(color='red')).add_to(my_map)
-        for lat, lon in self.coordinates_list:
+        for lat, lon in coordinates_list:
             folium.Marker([lat, lon], icon=folium.Icon(color='black')).add_to(my_map)
+        HeatMap(places_list_coordinates).add_to(my_map)
         my_map.save("map.html")
 
 
@@ -177,3 +190,6 @@ if __name__ == '__main__':
     calculate_center.get_midpoint()
     location_finder = LocationFinder(calculate_center.midpoint, POI, coordinate_finder.coordinates_list)
     location_finder.find_meeting_places()
+    location_finder.extract_coordinates_from_places_list()
+    location_finder.visualize_table()
+    location_finder.visualize_coordinates(location_finder.closest_place_coordinates, location_finder.coordinates_list, location_finder.places_list_coordinates)
