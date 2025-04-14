@@ -116,11 +116,11 @@ class CalculateCenter:
 
 
 class LocationFinder:
-    def __init__(self, midpoint, point_of_interest):
+    def __init__(self, midpoint, point_of_interest, coordinates_list):
         self.location = None
         self.coordinates = None
         self.midpoint = midpoint
-        self.coordinates_list = []
+        self.coordinates_list = coordinates_list
         self.poi = point_of_interest
         self.centroid = None
         self.representative_point = None
@@ -161,18 +161,19 @@ class LocationFinder:
         my_map = folium.Map(location=map_center, zoom_start=12)
         coordinates = [coordinates]
         for lat, lon in coordinates:
-            folium.Marker([lat, lon]).add_to(my_map)
+            folium.Marker([lat, lon], icon=folium.Icon(color='red')).add_to(my_map)
+        for lat, lon in self.coordinates_list:
+            folium.Marker([lat, lon], icon=folium.Icon(color='black')).add_to(my_map)
         my_map.save("map.html")
 
 
 if __name__ == '__main__':
     address_check = AddressCheck()
     address_check.address_input()
-    addresses_list = address_check.addresses
     coordinate_finder = CoordinateFinder(*address_check.addresses)
     coordinate_finder.update_coordinates_list()
     calculate_center = CalculateCenter(coordinate_finder.coordinates_list)
     POI = "Restaurants"
     calculate_center.get_midpoint()
-    location_finder = LocationFinder(calculate_center.midpoint, POI)
+    location_finder = LocationFinder(calculate_center.midpoint, POI, coordinate_finder.coordinates_list)
     location_finder.find_meeting_places()
