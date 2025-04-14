@@ -19,10 +19,10 @@ class AddressCheck:
 
     def validate_input(self):
         while True:
-            option = input("Is this the correct address?").lower()
-            if option in ['yes', 'y', '1']:
+            self.option = input("Is this the correct address?").lower()
+            if self.option in ['yes', 'y', '1', 'done']:
                 return True
-            elif option in ['no', 'n', '2']:
+            elif self.option in ['no', 'n', '2']:
                 return False
             else:
                 print("Invalid input.")
@@ -36,6 +36,8 @@ class AddressCheck:
                 self.address = self.lookup_address()
                 if self.validate_input():
                     self.addresses.append(self.address)
+                    if self.option == 'done':
+                        break
                 else:
                     self.address = input("Please reenter the address:")
                     if self.address.lower() == 'done':
@@ -43,6 +45,8 @@ class AddressCheck:
                     self.address = self.lookup_address()
                     if self.validate_input():
                         self.addresses.append(self.address)
+                        if self.option == 'done':
+                            break
             except AttributeError:
                 print(f'Address not found')
 
