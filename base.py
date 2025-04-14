@@ -1,7 +1,8 @@
 import geopy
 from shapely.geometry import Polygon, LineString, Point
 import folium
-
+import pandas as pd
+pd.set_option('display.max_colwidth', 125)
 
 class AddressCheck:
     def __init__(self):
@@ -61,7 +62,7 @@ class CoordinateFinder:
         self.coordinates_list = []
         for address in self.addresses:
             self.coordinates = self.get_coordinates(address)
-            print(f'self.coordinates:{self.coordinates}')
+            #print(f'self.coordinates:{self.coordinates}')
             if not self.coordinates:
                 return f"Could not find coordinates for {address}"
             self.coordinates_list.append(self.coordinates)
@@ -77,6 +78,7 @@ class CalculateCenter:
         self.average_latitude = None
         self.average_longitude = None
         self.midpoint = None
+        self.places_list = []
 
     def get_midpoint(self):
         if len(self.coordinates_list) < 3:
@@ -126,11 +128,10 @@ class LocationFinder:
     def find_places_nearby(self):
         geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
         query = f"{self.poi} near {self.midpoint[0]}, {self.midpoint[1]}"
-        # query = f"parks near {self.midpoint[0]}, {self.midpoint[1]}"
-        places_list = geolocate.geocode(query, exactly_one=False, limit=10)
-        print(f"List of Places: {places_list}")
-        if places_list:
-            for place in places_list:
+        self.places_list = geolocate.geocode(query, exactly_one=False, limit=10)
+        #print(f"List of Places: {self.places_list}")
+        if self.places_list:
+            for place in self.places_list:
                 return [(place.address, place.latitude, place.longitude)]
         else:
             return []
@@ -139,8 +140,9 @@ class LocationFinder:
         closest_place = self.find_places_nearby()
         print(f"closest_place:{closest_place}")
         closest_place_coordinates = (closest_place[0][1], closest_place[0][2])
-        print(f"closest_place_coordinates:{closest_place_coordinates}")
+        #print(f"closest_place_coordinates:{closest_place_coordinates}")
         self.visualize_coordinates(closest_place_coordinates)
+        self.visualize_table()
         if closest_place:
             return {
                 "midpoint": self.midpoint,
@@ -148,6 +150,11 @@ class LocationFinder:
             }
         else:
             return "No places found near midpoint"
+
+    def visualize_table(self):
+        df = pd.DataFrame(self.places_list, columns=['Place', 'Coordinates'])
+        df.set_index('Place', inplace=True)
+        print(df)
 
     def visualize_coordinates(self, coordinates):
         map_center = coordinates[0], coordinates[1]
@@ -168,4 +175,4 @@ if __name__ == '__main__':
     POI = "Restaurants"
     calculate_center.get_midpoint()
     location_finder = LocationFinder(calculate_center.midpoint, POI)
-    result = location_finder.find_meeting_places()
+    location_finder.find_meeting_places()
