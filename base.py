@@ -130,7 +130,6 @@ class LocationFinder:
         geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
         query = f"{self.poi} near {self.midpoint[0]}, {self.midpoint[1]}"
         self.places_list = geolocate.geocode(query, exactly_one=False, limit=10)
-        #print(f"List of Places: {self.places_list}")
         if self.places_list:
             for place in self.places_list:
                 return [(place.address, place.latitude, place.longitude)]
@@ -139,26 +138,20 @@ class LocationFinder:
 
     def extract_coordinates_from_places_list(self):
         places_list_coordinates = []
-        print(f'debug_places_list{self.places_list}')
-        places_list = self.places_list
-        ## This loop is not wokring correctly. It is only extracting the first instance
-        for place in places_list:
+        for place in self.places_list:
             coordinates = place.latitude, place.longitude
-            print(f'coordinates_debug{coordinates}')
             places_list_coordinates.append(coordinates)
         self.places_list_coordinates = places_list_coordinates
         return self.places_list_coordinates
 
     def find_meeting_places(self):
-        closest_place = self.find_places_nearby()
-        print(f"closest_place:{closest_place}")
-        closest_place_coordinates = (closest_place[0][1], closest_place[0][2])
-        self.closest_place_coordinates = closest_place_coordinates
-        #print(f"closest_place_coordinates:{closest_place_coordinates}")
-        if closest_place:
+        self.closest_place = self.find_places_nearby()
+        #print(f"closest_place:{closest_place}")
+        self.closest_place_coordinates = (self.closest_place[0][1], self.closest_place[0][2])
+        if self.closest_place:
             return {
                 "midpoint": self.midpoint,
-                "places": closest_place
+                "places": self.closest_place
             }
         else:
             return "No places found near midpoint"
