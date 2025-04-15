@@ -37,11 +37,16 @@ class AddressCheck:
             self.address = input(string)
             if self.address.lower() == 'done':
                 break
-            self.address = self.lookup_address()
-            if self.validate_input():
-                self.addresses.append(self.address)
-            else:
-                continue
+            try:
+                self.address = self.lookup_address()
+                if self.validate_input():
+                    self.addresses.append(self.address)
+                else:
+                    continue
+            except AttributeError:
+                print(f'Address not found')
+            except Exception as e:
+                print('Unknown error occurred: ' + string(e))
 
 
 class CoordinateFinder:
