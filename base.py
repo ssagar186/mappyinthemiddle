@@ -120,6 +120,9 @@ class CalculateCenter:
 
 class LocationFinder:
     def __init__(self, midpoint, point_of_interest, coordinates_list):
+        self.places_list_coordinates = None
+        self.closest_place = None
+        self.closest_place_coordinates = None
         self.places_list = None
         self.location = None
         self.coordinates = None
@@ -149,7 +152,6 @@ class LocationFinder:
 
     def find_meeting_places(self):
         self.closest_place = self.find_places_nearby()
-        #print(f"closest_place:{closest_place}")
         self.closest_place_coordinates = (self.closest_place[0][1], self.closest_place[0][2])
         if self.closest_place:
             return {
@@ -159,12 +161,12 @@ class LocationFinder:
         else:
             return "No places found near midpoint"
 
-    def visualize_table(self):
-        df = pd.DataFrame(self.places_list, columns=['Place', 'Coordinates'])
-        df.set_index('Place', inplace=True)
+class VisualizationTools:
+    def visualize_table(cls, places_list):
+        df = pd.DataFrame(places_list, columns=['Places', 'Coordinates'])
+        df.set_index('Places', inplace=True)
         print(df)
-
-    def visualize_coordinates(self, closest_place_coordinates, coordinates_list, places_list_coordinates):
+    def visualize_coordinates(cls, closest_place_coordinates, coordinates_list, places_list_coordinates):
         map_center = closest_place_coordinates[0], closest_place_coordinates[1]
         my_map = folium.Map(location=map_center, zoom_start=12)
         coordinates = [closest_place_coordinates]
@@ -187,5 +189,6 @@ if __name__ == '__main__':
     location_finder = LocationFinder(calculate_center.midpoint, POI, coordinate_finder.coordinates_list)
     location_finder.find_meeting_places()
     location_finder.extract_coordinates_from_places_list()
-    location_finder.visualize_table()
-    location_finder.visualize_coordinates(location_finder.closest_place_coordinates, location_finder.coordinates_list, location_finder.places_list_coordinates)
+    visualization_tools = VisualizationTools()
+    visualization_tools.visualize_table(location_finder.places_list)
+    visualization_tools.visualize_coordinates(location_finder.closest_place_coordinates, location_finder.coordinates_list, location_finder.places_list_coordinates)
