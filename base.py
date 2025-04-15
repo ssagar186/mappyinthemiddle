@@ -7,6 +7,7 @@ pd.set_option('display.max_colwidth', 125)
 
 class AddressCheck:
     def __init__(self):
+        self.option = None
         self.location = None
         self.addresses = []
         self.address = None
@@ -20,35 +21,27 @@ class AddressCheck:
     def validate_input(self):
         while True:
             self.option = input("Is this the correct address?").lower()
-            if self.option in ['yes', 'y', '1', 'done']:
+            if self.option in ['yes', 'y', '1']:
                 return True
-            elif self.option in ['no', 'n', '2']:
+            elif self.option in ['no', 'n', '2', 'done']:
                 return False
             else:
                 print("Invalid input.")
 
-    def address_input(self):
+    def user_input(self):
         while True:
-            self.address = input("Please enter an address (or type 'done' to finish): ")
+            if len(self.addresses) < 1:
+                string = "Please enter an address (or type 'done' to finish): "
+            else:
+                string = "Please enter a new address (or type 'done' to finish): "
+            self.address = input(string)
             if self.address.lower() == 'done':
                 break
-            try:
-                self.address = self.lookup_address()
-                if self.validate_input():
-                    self.addresses.append(self.address)
-                    if self.option == 'done':
-                        break
-                else:
-                    self.address = input("Please reenter the address:")
-                    if self.address.lower() == 'done':
-                        break
-                    self.address = self.lookup_address()
-                    if self.validate_input():
-                        self.addresses.append(self.address)
-                        if self.option == 'done':
-                            break
-            except AttributeError:
-                print(f'Address not found')
+            self.address = self.lookup_address()
+            if self.validate_input():
+                self.addresses.append(self.address)
+            else:
+                continue
 
 
 class CoordinateFinder:
@@ -122,6 +115,7 @@ class CalculateCenter:
 
 class LocationFinder:
     def __init__(self, midpoint, point_of_interest, coordinates_list):
+        self.places_list = None
         self.location = None
         self.coordinates = None
         self.midpoint = midpoint
@@ -179,7 +173,7 @@ class LocationFinder:
 
 if __name__ == '__main__':
     address_check = AddressCheck()
-    address_check.address_input()
+    address_check.user_input()
     coordinate_finder = CoordinateFinder(*address_check.addresses)
     coordinate_finder.update_coordinates_list()
     calculate_center = CalculateCenter(coordinate_finder.coordinates_list)
