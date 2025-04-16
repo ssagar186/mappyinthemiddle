@@ -3,6 +3,7 @@ from src.calculate_center import CalculateCenter
 from src.coordinate_finder import CoordinateFinder
 from src.location_finder import LocationFinder
 from src.visualization_tools import VisualizationTools
+import src.parameters as config
 
 
 if __name__ == '__main__':
@@ -11,7 +12,7 @@ if __name__ == '__main__':
     coordinate_finder = CoordinateFinder(*address_check.addresses)
     coordinate_finder.update_coordinates_list()
     calculate_center = CalculateCenter(coordinate_finder.coordinates_list)
-    POI = "Restaurants"
+    POI = config.poi
     calculate_center.get_midpoint()
     location_finder = LocationFinder(calculate_center.midpoint, POI, coordinate_finder.coordinates_list)
     location_finder.find_meeting_places()

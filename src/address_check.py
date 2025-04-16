@@ -10,9 +10,9 @@ class AddressCheck:
 
     def lookup_address(self):
         geolocator = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
-        self.location = geolocator.geocode(self.address)
-        print(f"Validated Address: {self.location.address}")
-        return self.location.address
+        location = geolocator.geocode(self.address)
+        print(f"Validated Address: {location.address}")
+        return location.address
 
     def validate_input(self):
         while True:
