@@ -1,1 +1,1 @@
-poi = "restaurants"
+poi = "Parks"
