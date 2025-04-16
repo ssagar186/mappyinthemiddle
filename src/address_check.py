@@ -33,12 +33,11 @@ class AddressCheck:
             self.address = input(string)
             if self.address == 'quit':
                 sys.exit()
+            if self.address.lower() == 'done' and len(self.addresses) > 1:
+                break
             if self.address.lower() == 'done' and len(self.addresses) < 2:
                 continue
-            if self.address.lower() == 'done' and len(self.addresses) > 0:
-                break
             try:
-                print('debug2')
                 self.address = self.lookup_address()
                 if self.validate_input():
                     self.addresses.append(self.address)
