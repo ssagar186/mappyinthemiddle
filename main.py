@@ -12,9 +12,8 @@ if __name__ == '__main__':
     coordinate_finder = CoordinateFinder(*address_check.addresses)
     coordinate_finder.update_coordinates_list()
     calculate_center = CalculateCenter(coordinate_finder.coordinates_list)
-    POI = config.poi
     calculate_center.get_midpoint()
-    location_finder = LocationFinder(calculate_center.midpoint, POI, coordinate_finder.coordinates_list)
+    location_finder = LocationFinder(calculate_center.midpoint, config.poi, coordinate_finder.coordinates_list)
     location_finder.find_meeting_places()
     location_finder.extract_coordinates_from_places_list()
     visualization_tools = VisualizationTools()
