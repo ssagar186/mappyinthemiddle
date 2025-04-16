@@ -1,5 +1,5 @@
 import geopy
-
+import sys
 
 class AddressCheck:
     def __init__(self):
@@ -27,17 +27,18 @@ class AddressCheck:
     def user_input(self):
         while True:
             if len(self.addresses) < 1:
-                string = "Please enter an address (or type 'done' to finish): "
-                if self.option == 'done':
-                    break
+                string = "Please enter an address (or type 'quit' to exit): "
             else:
                 string = "Please enter another address (or type 'done' to finish): "
-                if self.option == 'done':
-                    break
             self.address = input(string)
-            if self.address.lower() == 'done':
+            if self.address == 'quit':
+                sys.exit()
+            if self.address.lower() == 'done' and len(self.addresses) < 2:
+                continue
+            if self.address.lower() == 'done' and len(self.addresses) > 0:
                 break
             try:
+                print('debug2')
                 self.address = self.lookup_address()
                 if self.validate_input():
                     self.addresses.append(self.address)
