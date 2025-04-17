@@ -14,5 +14,8 @@ if __name__ == '__main__':
     location_finder.find_closest_place()
     location_finder.extract_coordinates_from_places_list()
     visualization_tools = VisualizationTools()
-    visualization_tools.visualize_table(location_finder.places_list)
-    visualization_tools.visualize_coordinates(location_finder.closest_place_coordinates, location_finder.coordinates_list, location_finder.places_list_coordinates)
+    df = visualization_tools.create_data_table(location_finder.places_list)
+    print(df)
+    visualization_tools.create_map_object(location_finder.closest_place_coordinates, location_finder.coordinates_list, location_finder.places_list_coordinates)
+
+4
