@@ -15,7 +15,7 @@ class LocationFinder:
         self.centroid = None
         self.representative_point = None
 
-    def find_places_nearby(self):
+    def find_places_nearby_list(self):
         geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
         query = f"{self.poi} near {self.midpoint[0]}, {self.midpoint[1]}"
         self.places_list = geolocate.geocode(query, exactly_one=False, limit=10)
@@ -33,8 +33,8 @@ class LocationFinder:
         self.places_list_coordinates = places_list_coordinates
         return self.places_list_coordinates
 
-    def find_meeting_places(self):
-        self.closest_place = self.find_places_nearby()
+    def find_closest_place(self):
+        self.closest_place = self.find_places_nearby_list()
         self.closest_place_coordinates = (self.closest_place[0][1], self.closest_place[0][2])
         if self.closest_place:
             return {

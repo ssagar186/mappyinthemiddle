@@ -8,7 +8,7 @@ class CoordinateFinder:
         self.coordinates = None
         self.coordinates_list = []
 
-    def get_coordinates(self, address):
+    def get_coordinates_from_address(self, address):
         geolocate = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
         self.location = geolocate.geocode(address)
         return self.location.latitude, self.location.longitude
@@ -16,7 +16,7 @@ class CoordinateFinder:
     def update_coordinates_list(self):
         self.coordinates_list = []
         for address in self.addresses:
-            self.coordinates = self.get_coordinates(address)
+            self.coordinates = self.get_coordinates_from_address(address)
             #print(f'self.coordinates:{self.coordinates}')
             if not self.coordinates:
                 return f"Could not find coordinates for {address}"

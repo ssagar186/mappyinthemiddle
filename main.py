@@ -14,7 +14,7 @@ if __name__ == '__main__':
     calculate_center = CalculateCenter(coordinate_finder.coordinates_list)
     calculate_center.get_midpoint()
     location_finder = LocationFinder(calculate_center.midpoint, config.poi, coordinate_finder.coordinates_list)
-    location_finder.find_meeting_places()
+    location_finder.find_closest_place()
     location_finder.extract_coordinates_from_places_list()
     visualization_tools = VisualizationTools()
     visualization_tools.visualize_table(location_finder.places_list)

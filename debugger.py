@@ -11,7 +11,7 @@ if __name__ == '__main__':
     coordinates_list = [(33.7489924, -84.3902644), (33.8595492, -84.683824)]
     poi = "parking"
     location_finder = LocationFinder(midpoint, poi, coordinates_list)
-    location_finder.find_meeting_places()
+    location_finder.find_closest_place()
     location_finder.extract_coordinates_from_places_list()
     visualization_tools = VisualizationTools()
     visualization_tools.visualize_table(location_finder.places_list)
