@@ -16,6 +16,11 @@ if __name__ == '__main__':
     location_finder = LocationFinder(calculate_center.midpoint, config.poi, coordinate_finder.coordinates_list)
     location_finder.find_closest_place()
     location_finder.extract_coordinates_from_places_list()
-    visualization_tools = VisualizationTools()
-    visualization_tools.create_data_table(location_finder.places_list)
-    visualization_tools.create_map_object(location_finder.closest_place_coordinates, location_finder.coordinates_list, location_finder.places_list_coordinates)
+    df = VisualizationTools.create_data_table(location_finder.places_list)
+    print(df)
+    places_map = VisualizationTools.create_map_object(location_finder.closest_place_coordinates)
+    places_map = VisualizationTools.construct_map(places_map, location_finder.closest_place_coordinates,
+                                                  location_finder.coordinates_list,
+                                                  location_finder.places_list_coordinates)
+    VisualizationTools.save_map(places_map)
+
