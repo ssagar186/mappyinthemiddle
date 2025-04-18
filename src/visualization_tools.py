@@ -4,13 +4,24 @@ from folium.plugins import HeatMap
 pd.set_option('display.max_colwidth', 125)
 
 
-class VisualizationTools:
+class DataFormatting:
+    def __init__(self, places_list):
+        self.places_list = places_list
+        self.df = None
 
-    @classmethod
-    def create_data_table(cls, places_list):
-        df = pd.DataFrame(places_list, columns=['Places', 'Coordinates'])
+    def create_data_table(self):
+        df = pd.DataFrame(self.places_list, columns=['Places', 'Coordinates'])
         df.set_index('Places', inplace=True)
-        return df
+        self.df = df
+        return self.df
+
+    def print_data_table(self):
+        print(self.df)
+
+class MapMaker:
+    @classmethod
+    def print_data_table(cls, df):
+        print(df)
 
     @classmethod
     def create_map_object(cls, closest_place_coordinates):
