@@ -18,6 +18,7 @@ if __name__ == '__main__':
     location_finder.find_closest_place()
     location_finder.extract_coordinates_from_places_list()
     data_formatting = DataFormatting(location_finder.places_list)
+    data_formatting.create_data_table()
     data_formatting.print_data_table()
     places_map = MapMaker.create_map_object(location_finder.closest_place_coordinates)
     places_map = MapMaker.construct_map(places_map, location_finder.closest_place_coordinates,

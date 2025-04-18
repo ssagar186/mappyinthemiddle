@@ -12,7 +12,6 @@ if __name__ == '__main__':
     midpoint = (33.8042708, -84.5370442)
     coordinates_list = [(33.7489924, -84.3902644), (33.8595492, -84.683824)]
     front_end_tools = FrontEndTools()
-    front_end_tools.create_front_end()
     poi = "parking"
     location_finder = LocationFinder(midpoint, poi, coordinates_list)
     location_finder.find_closest_place()
