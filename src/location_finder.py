@@ -2,7 +2,7 @@ import geopy
 
 
 class LocationFinder:
-    def __init__(self, midpoint, point_of_interest, coordinates_list):
+    def __init__(self, midpoint, point_of_interest, origin_coordinates_list):
         self.places_list_coordinates = None
         self.closest_place = None
         self.closest_place_coordinates = None
@@ -10,7 +10,7 @@ class LocationFinder:
         self.location = None
         self.coordinates = None
         self.midpoint = midpoint
-        self.coordinates_list = coordinates_list
+        self.origin_coordinates_list = origin_coordinates_list
         self.poi = point_of_interest
         self.centroid = None
         self.representative_point = None

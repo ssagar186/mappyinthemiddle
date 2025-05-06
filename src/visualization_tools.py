@@ -30,11 +30,13 @@ class MapMaker:
         return output_map
 
     @classmethod
-    def construct_map(cls, places_map, closest_place_coordinates, origin_coordinates_list, places_list_coordinates):
+    def construct_map(cls, places_map, closest_place_coordinates, origin_coordinates_list, places_list_coordinates, midpoint):
         poi_coordinates = [closest_place_coordinates]
+        midpoint = [midpoint]
         cls.create_markers(poi_coordinates, 'red', places_map)
-        places_map = cls.create_markers(poi_coordinates, 'red', places_map)
-        places_map = cls.create_markers(origin_coordinates_list, 'black', places_map)
+        places_map = cls.create_markers(poi_coordinates, 'green', places_map)
+        places_map = cls.create_markers(origin_coordinates_list, 'red', places_map)
+        places_map = cls.create_markers(midpoint, 'black', places_map)
         places_map = cls.create_heatmap(places_list_coordinates, places_map)
         return places_map
 
