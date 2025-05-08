@@ -20,7 +20,7 @@ if __name__ == '__main__':
     for address in enumerate(location_finder.origin_coordinates_list):
         response = location_finder.calculate_traffic_to_midpoint(address[1])
         travel_time = response['routes'][0]['duration']
-        if len(travel_time) > 0 and travel_time[-1].isalpha():
+        if travel_time[-1].isalpha():
             travel_time = travel_time[:-1]
         travel_time = int(travel_time)/60
         travel_distance = response['routes'][0]['distanceMeters']/1609
