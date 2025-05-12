@@ -1,4 +1,4 @@
-from src.address_check import AddressCheck
+from src.address_input_lookup import AddressInputLookup
 from src.calculate_center import CalculateCenter
 from src.coordinate_finder import CoordinateFinder
 from src.location_finder import LocationFinder
@@ -9,7 +9,7 @@ from src.routes import Routes
 
 
 if __name__ == '__main__':
-    address_check = AddressCheck()
+    address_check = AddressInputLookup()
     address_check.user_input()
     coordinate_finder = CoordinateFinder(*address_check.addresses)
     coordinate_finder.update_coordinates_list()

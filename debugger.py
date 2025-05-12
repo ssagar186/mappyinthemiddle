@@ -1,4 +1,4 @@
-from src.address_check import AddressCheck
+from src.address_check import AddressInputLookup
 from src.calculate_center import CalculateCenter
 from src.coordinate_finder import CoordinateFinder
 from src.location_finder import LocationFinder

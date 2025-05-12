@@ -1,17 +1,11 @@
-import geopy
 import sys
+from src.validate_address import validate_address
 
-class AddressCheck:
+class AddressInputLookup:
     def __init__(self):
         self.location = None
         self.addresses = []
         self.address = None
-
-    def lookup_address(self, address):
-        geolocator = geopy.Nominatim(user_agent="mappy_in_the_middle", timeout=10)
-        location = geolocator.geocode(address)
-        print(f"Validated Address: {location.address}")
-        return location.address
 
     def user_input(self):
         while True:
@@ -27,7 +21,7 @@ class AddressCheck:
             if address.lower() == 'done' and len(self.addresses) < 2:
                 continue
             try:
-                self.address = self.lookup_address(address)
+                self.address = validate_address(address)
                 if self.confirm_input():
                     self.addresses.append(self.address)
                 else:

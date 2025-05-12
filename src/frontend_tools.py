@@ -1,5 +1,5 @@
 import tkinter as tk
-from src.address_check import AddressCheck
+from src.address_check import AddressInputLookup
 
 
 class FrontEndTools:
