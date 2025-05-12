@@ -5,6 +5,7 @@ from src.location_finder import LocationFinder
 from src.visualization_tools import MapMaker
 from src.visualization_tools import DataFormatting
 import src.parameters as config
+from src.routes import Routes
 
 
 if __name__ == '__main__':
@@ -17,13 +18,11 @@ if __name__ == '__main__':
     location_finder = LocationFinder(calculate_center.midpoint, config.poi, coordinate_finder.origin_coordinates_list)
     location_finder.find_closest_place()
     location_finder.extract_coordinates_from_places_list()
+    routes = Routes(location_finder.midpoint)
     for address in enumerate(location_finder.origin_coordinates_list):
-        response = location_finder.calculate_traffic_to_midpoint(address[1])
-        travel_time = response['routes'][0]['duration']
-        if travel_time[-1].isalpha():
-            travel_time = travel_time[:-1]
-        travel_time = round(int(travel_time)/60)
-        travel_distance = round(response['routes'][0]['distanceMeters']/1609)
+        routes.calculate_route_to_midpoint(address[1])
+        travel_time = routes.calculate_traffic_to_midpoint()
+        travel_distance = routes.calculate_distance_to_midpoint()
         print(f'Distance from {address_check.addresses[(address[0])]} to the midpoint is {travel_distance}mi. It will take {travel_time} minutes to get there.')
     data_formatting = DataFormatting(location_finder.places_list)
     data_formatting.create_data_table()

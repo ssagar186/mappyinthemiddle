@@ -1,7 +1,6 @@
 import geopy
 import requests
 import json
-from src.keys import api_key
 
 class LocationFinder:
     def __init__(self, midpoint, point_of_interest, origin_coordinates_list):
@@ -45,43 +44,3 @@ class LocationFinder:
             }
         else:
             return "No places found near midpoint"
-
-    def calculate_traffic_to_midpoint(self, origin_coordinates):
-        url = "https://routes.googleapis.com/directions/v2:computeRoutes"
-        headers = {
-            "Content-Type": "application/json",
-            "X-Goog-Api-Key": api_key,
-            "X-Goog-FieldMask": "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline"
-        }
-
-        payload = {
-            "origin": {
-                "location": {
-                    "latLng": {
-                        "latitude": origin_coordinates[0],
-                        "longitude": origin_coordinates[1]
-                    }
-                }
-            },
-            "destination": {
-                "location": {
-                    "latLng": {
-                        "latitude": self.midpoint[0],
-                        "longitude": self.midpoint[1]
-                    }
-                }
-            },
-            "travelMode": "DRIVE",
-            "routingPreference": "TRAFFIC_AWARE",
-            "computeAlternativeRoutes": False,
-            "routeModifiers": {
-                "avoidTolls": False,
-                "avoidHighways": False,
-                "avoidFerries": False
-            },
-            "languageCode": "en-US",
-            "units": "IMPERIAL"
-        }
-
-        response = requests.post(url, headers=headers, data=json.dumps(payload))
-        return response.json()

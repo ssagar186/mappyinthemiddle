@@ -17,7 +17,7 @@ if __name__ == '__main__':
     location_finder.find_closest_place()
     location_finder.extract_coordinates_from_places_list()
     for address in enumerate(location_finder.origin_coordinates_list):
-        response = location_finder.calculate_traffic_to_midpoint(address[1])
+        response = location_finder.calculate_route_to_midpoint(address[1])
         travel_time = response['routes'][0]['duration']
         if travel_time[-1].isalpha():
             travel_time = travel_time[:-1]
