@@ -22,9 +22,9 @@ if __name__ == '__main__':
         travel_time = response['routes'][0]['duration']
         if travel_time[-1].isalpha():
             travel_time = travel_time[:-1]
-        travel_time = int(travel_time)/60
-        travel_distance = response['routes'][0]['distanceMeters']/1609
-        print(f'Distance from {address_check.addresses[(address[0])]} to the midpoint is {travel_time}. It will take {travel_time} to get there.')
+        travel_time = round(int(travel_time)/60)
+        travel_distance = round(response['routes'][0]['distanceMeters']/1609)
+        print(f'Distance from {address_check.addresses[(address[0])]} to the midpoint is {travel_distance}mi. It will take {travel_time} minutes to get there.')
     data_formatting = DataFormatting(location_finder.places_list)
     data_formatting.create_data_table()
     data_formatting.print_data_table()
